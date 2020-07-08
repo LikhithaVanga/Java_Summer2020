@@ -26,6 +26,7 @@ public class PhoneCall extends AbstractPhoneCall {
     this.Stop = validateDate(stop);
     this.Start_time = StartTime;
     this.End_time = EndTime;
+
   }
 
 
@@ -62,7 +63,7 @@ public class PhoneCall extends AbstractPhoneCall {
       catch (ParseException e)
       {
         System.out.println(strtDate+" is not a valid date format");
-        return "";
+        return strtDate+" is not a valid date format";
       }
       return strtDate;
     }

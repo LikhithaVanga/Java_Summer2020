@@ -29,30 +29,32 @@ public class Project1 {
       System.err.println("Missing call end time");
       System.exit(1);
     }else if (args.length == 7) {
+      System.out.println("call from " +args[1] +"to" +args[3]+ "ön" + args[4]);
       System.err.println("Missing print");
       System.exit(1);
     } else if (args.length == 8) {
       if(args[7].equals("-README") || args[7].equals("-readme"))
       {
         readme();
+        System.exit(1);
       }
       else{
-        PhoneCall call = new PhoneCall(args[1], args[2], args[3], args[4],args[5], args[6]);// Refer to one of Dave's classes so that we can be sure it is on the classpath
-        PhoneBill bill = new PhoneBill(args[0]);
 
-        bill.addPhoneCall(call);
 
         if ((args[7].equals("-print") || args[7].equals("-PRINT"))){
+          PhoneCall call = new PhoneCall(args[1], args[2], args[3], args[4],args[5], args[6]);
           call.printCaller();
           System.exit(1);
         }
         else{
           System.out.println("Missing command line arguments");
         }
+
       }
     } else if (args.length > 9) {
       System.err.println("Too many args");
       System.exit(1);
+
     } else {
 
       PhoneCall call = new PhoneCall(args[1], args[2], args[3], args[4],args[5], args[6]);// Refer to one of Dave's classes so that we can be sure it is on the classpath
@@ -73,7 +75,6 @@ public class Project1 {
   }
 
   public static void readme(){
-    System.out.println();
     System.out.println("Customer is the caller");
     System.out.println("Caller stores the customers phone number");
     System.out.println("Calee stores the recevers phone number");

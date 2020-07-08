@@ -23,6 +23,8 @@ public class Project1Test extends InvokeMainTestCase {
     return invokeMain(Project1.class, args );
   }
 
+
+
   @Test
   public void readmeCanBeReadAsResource() throws IOException {
     try (
@@ -35,6 +37,8 @@ public class Project1Test extends InvokeMainTestCase {
     }
   }
 
+
+
   /**
    * Test to check when there are no cmd line args
    */
@@ -44,6 +48,15 @@ public class Project1Test extends InvokeMainTestCase {
     assertThat(result.getExitCode(), equalTo(1));
     assertThat(result.getTextWrittenToStandardError(), containsString("No arguments!"));
   }
+
+  @Test
+  public void testPhoneCall(){
+    MainMethodResult result = invokeMain();
+    assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardError(), containsString("No arguments!"));
+  }
+
+
 
   @Test
   public void test1CommandLineArguments(){
@@ -90,6 +103,20 @@ public class Project1Test extends InvokeMainTestCase {
   /**
    * Test to verify display message is same as inputed cmd line args
    */
+  @Test
+  public void displayMSG() {
+    MainMethodResult result = invokeMain(new String[] {"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 am", "01/01/2020", "02:00 am", "-print", "-readme"});
+    assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("Customer is the caller"));
+
+  }
+
+  @Test
+  public void displayMSG1() {
+    MainMethodResult result = invokeMain(new String[] {"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 am", "01/01/2020", "02:00 am", "-readme", "-print"});
+    assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("Phone call from 503-449-7833 to 234-234-2345"));
+  }
 
 
   /**
@@ -101,5 +128,36 @@ public class Project1Test extends InvokeMainTestCase {
     assertThat(result.getExitCode(), equalTo(1));
     assertThat(result.getTextWrittenToStandardError(), containsString("Too many args"));
   }
+
+  @Test
+  public void test2CommandLineArgumentsforExit() {
+    MainMethodResult result = invokeMain("something", "S2");
+    assertThat(result.getExitCode(), equalTo(1));
+  }
+
+  @Test
+  public void testNoCommandLineArgumentsforexit() {
+    MainMethodResult result = invokeMain();
+    assertThat(result.getExitCode(), equalTo(1));
+  }
+
+  @Test
+  public void ifArg7isReadmeforSystemexit() {
+    MainMethodResult result = invokeMain(Project1.class, "Likhitha", "503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am", "-README");
+    assertThat(result.getExitCode(), equalTo(1));
+  }
+  @Test
+  public void tooManyCLAforExit() {
+    MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 AM", "01/01/2020", "02:00 AM", "-print", "-readme", "hgfftg"});
+    assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardError(), containsString("Too many args"));
+  }
+  @Test
+  public void mainMethod() {
+    MainMethodResult result = invokeMain(Project1.class,"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 AM", "01/01/2020", "02:00 AM", "-print", "-print");
+    //assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("Phone call from 503-449-7833 to 234-234-2345 from 02:00 AM to 01:00 AM"));
+  }
+
 
 }

@@ -29,5 +29,61 @@ public class Project1IT extends InvokeMainTestCase {
       assertThat(result.getExitCode(), equalTo(1));
       assertThat(result.getTextWrittenToStandardError(), containsString("No arguments!"));
   }
-  
+    @Test
+    public void test1CommandLineArguments(){
+        MainMethodResult result = invokeMain("something");
+        assertThat(result.getExitCode(), equalTo(1));
+        assertThat(result.getTextWrittenToStandardError(), containsString("Missing Caller number"));
+    }
+
+    @Test
+    public void test2CommandLineArguments(){
+        MainMethodResult result = invokeMain("something", "S2");
+        assertThat(result.getExitCode(), equalTo(1));
+        assertThat(result.getTextWrittenToStandardError(), containsString("Missing Calee number"));
+    }
+
+    @Test
+    public void displayoutputMSG() {
+        MainMethodResult result = invokeMain(Project1.class, "Likhitha", "503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
+        assertThat(result.getExitCode(), equalTo(1));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("call from 503-449-7833"));
+
+    }
+
+    @Test
+    public void ifArg7isReadme() {
+        MainMethodResult result = invokeMain(Project1.class,  "Likhitha","503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am", "-README");
+        assertThat(result.getExitCode(), equalTo(1));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("Customer is the caller"));
+
+    }
+
+    @Test
+    public void ifArg7isPrint() {
+        MainMethodResult result = invokeMain(Project1.class,  "Likhitha","503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am", "-PRINT","-README");
+        assertThat(result.getExitCode(), equalTo(1));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("Customer is the caller"));
+
+    }
+    @Test
+    public void test2CommandLineArgumentsforExit() {
+        MainMethodResult result = invokeMain("something", "S2");
+        assertThat(result.getExitCode(), equalTo(1));
+    }
+
+    @Test
+    public void testNoCommandLineArgumentsforexit() {
+        MainMethodResult result = invokeMain();
+        assertThat(result.getExitCode(), equalTo(1));
+    }
+
+    @Test
+    public void ifArg7isReadmeforSystemexit() {
+        MainMethodResult result = invokeMain(Project1.class, "Likhitha", "503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am", "-README");
+        assertThat(result.getExitCode(), equalTo(1));
+    }
+
+
+
 }

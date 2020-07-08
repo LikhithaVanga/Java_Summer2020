@@ -14,6 +14,7 @@ public class PhoneBillTest {
         PhoneBill bill = new PhoneBill(name);
         assertThat(bill.getCustomer(), not(nullValue()));
         assertThat(bill.getCustomer(), containsString(name));
+
     }
 
     @Test

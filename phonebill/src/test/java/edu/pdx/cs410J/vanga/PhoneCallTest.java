@@ -47,6 +47,11 @@ public class PhoneCallTest {
     PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
     assertThat(call.getStartTime(), is(nullValue()));
   }
+  @Test
+  public void returnNotValidIfdateNotvalid() {
+    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "ABCD", "1:00 am", "01/01/2020", "1:00 am");
+    assertThat(call.validateDate("ABCD"), containsString("not a valid date"));
+  }
 
 
 
