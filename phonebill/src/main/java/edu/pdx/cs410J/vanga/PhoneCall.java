@@ -51,6 +51,7 @@ public class PhoneCall<pattern, TIME12HOURS_PATTERN> extends AbstractPhoneCall {
     this.Stop = validateJavaDate(stop);
     this.Start_time = timeStart;
     this.End_time = timeEnd;
+
   }
 
   /**
@@ -96,7 +97,7 @@ public class PhoneCall<pattern, TIME12HOURS_PATTERN> extends AbstractPhoneCall {
       catch (ParseException e)
       {
         System.out.println(strDate+" is Invalid Date format");
-        return "";
+        return "Invalid Date format";
       }
       return strDate;
     }

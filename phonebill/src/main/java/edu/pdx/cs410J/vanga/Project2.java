@@ -156,6 +156,9 @@ public class Project2 {
     else if(args.length > 11){
       System.out.println("Too many args");
     }
+    else{
+      System.out.println("unknown cmd line args");
+    }
   }
 
   /**
