@@ -100,7 +100,20 @@ public class Project1Test extends InvokeMainTestCase {
   public void testFileNotExists(){
     try {
       File file = new File("tFile.txt");
-      MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 am", "01/01/2020", "02:00 am", "-textFile", "tFile1.txt"});
+      MainMethodResult result = invokeMain(new String[]{"vanga", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 am", "01/01/2020", "02:00 am", "-textFile", "vanga.txt"});
+      assertThat(result.getExitCode(), equalTo(1));
+      assertFalse(!file.exists());
+    }
+    catch (Throwable e) {
+      assertTrue(e instanceof RuntimeException);
+    }
+  }
+
+  @Test
+  public void testDifferentName(){
+    try {
+      File file = new File("tFile.txt");
+      MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 am", "01/01/2020", "02:00 am", "-textFile", "vanga.txt"});
       assertThat(result.getExitCode(), equalTo(1));
       assertFalse(!file.exists());
     }
@@ -320,6 +333,29 @@ public class Project1Test extends InvokeMainTestCase {
     MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 AM", "01/01/2020", "02:00 AM", "-print", "-readme", "hgfftg", "esrg", "ergferw"});
     //assertThat(result.getExitCode(), equalTo(1));
     assertThat(result.getTextWrittenToStandardOut(), containsString("Too many args"));
+  }
+
+  @Test
+  public void unknownCmdLineArgs() {
+    MainMethodResult result = invokeMain(new String[]{"whatever", "whatever"});
+    //assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString(""));
+  }
+
+  @Test
+  public void testReadme() {
+    MainMethodResult result = invokeMain(new String[]{"-readme"});
+    //assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("Customer is the caller"));
+  }
+
+
+
+  @Test
+  public void invalidPhnNumber() {
+    MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 AM", "01/01/2020", "02:00 AM", "hello"});
+    //assertThat(result.getExitCode(), equalTo(1));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("Invalid phone number"));
   }
 
 }
