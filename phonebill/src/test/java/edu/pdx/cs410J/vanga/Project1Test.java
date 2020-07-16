@@ -355,7 +355,7 @@ public class Project1Test extends InvokeMainTestCase {
   public void invalidPhnNumber() {
     MainMethodResult result = invokeMain(new String[]{"Likhitha", "503-449-7833", "234-234-2345", "01/01/2020", "01:00 AM", "01/01/2020", "02:00 AM", "hello"});
     //assertThat(result.getExitCode(), equalTo(1));
-    assertThat(result.getTextWrittenToStandardOut(), containsString("Invalid phone number"));
+    assertThat(result.getTextWrittenToStandardOut(), containsString("unknown cmd line args"));
   }
 
 }
