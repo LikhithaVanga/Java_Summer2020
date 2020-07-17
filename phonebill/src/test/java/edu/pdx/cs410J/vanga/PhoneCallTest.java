@@ -1,5 +1,7 @@
 package edu.pdx.cs410J.vanga;
 
+import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.hamcrest.CoreMatchers.*;
@@ -11,94 +13,85 @@ import static org.hamcrest.MatcherAssert.assertThat;
  * You'll need to update these unit tests as you build out you program.
  */
 public class PhoneCallTest {
+  PhoneCall call;
 
-  //(expected = UnsupportedOperationException.class)
-  //@Test(expected = UnsupportedOperationException.class)
+  @Before
+  public void initialize () {
+    call = new PhoneCall("Pranee","503-440-2707","503-645-3231","01/02/2014","22:45","01/02/2014","22:50");
 
-  /**
-   * Test to check start time string is implemented
-   */
-  @Test(expected = UnsupportedOperationException.class)
-  public void getStartTimeStringNeedsToBeImplemented() {
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "", "1:00 am", "", "2:00 am");
-    call.getStartTimeString();
   }
 
   /**
-   * Test to check if caller number is implemented
+   * Tests the getcaller method for phone calls
    */
   @Test
-  public void getCallerNeedsToBeImplemented(){
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getCaller(), not(nullValue()));
+  public void getCallerTest() {
+
+    assertThat(call.getCaller(), is(equalTo("503-440-2707")));
   }
 
   /**
-   * Test to check if calee is implemented
+   * Tests that the getCallee method
    */
   @Test
-  public void getCalleeNeedsToBeImplemented(){
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getCallee(), not(nullValue()));
+  public void getCalleeTest() {
+
+    assertThat(call.getCallee(), is(equalTo("503-645-3231")));
   }
 
   /**
-   * Test to check if caller number is valid
+   * Tests the getStartingTime method
    */
   @Test
-  public void invalidCallerNumber(){
-    PhoneCall call = new PhoneCall("ABCD", "345-876-3456", "", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getCaller(), not(nullValue()));
+  public void getStartingTest() {
+
+    assertThat(call.getStartTimeString(), is(equalTo("01/02/2014 22:45")));
   }
 
   /**
-   * Test to check if calee number is valid
+   * Tests the getEndingTime method
    */
   @Test
-  public void invalidCaleeNumber(){
-    PhoneCall call = new PhoneCall("503-449-7833", "ABCD", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getCallee(), not(nullValue()));
+  public void getEndingTest() {
+
+    assertThat(call.getEndTimeString(), is(equalTo("01/02/2014 22:50")));
   }
 
   /**
-   * Test to check if the calee is the same for inintial calls
+   * Tests the getCustomerString method
    */
   @Test
-  public void initiallyAllPhoneCallsHaveTheSameCallee() {
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getCallee(), containsString("34"));
+  public void getCustomerTest() {
+
+    assertThat(call.getCustomer(), is(equalTo("Pranee")));
   }
 
   /**
-   * Test to check if it is ok to return start time as " or null
+   * Tests the toString method
    */
   @Test
-  public void forProject1ItIsOkayIfGetStartTimeReturnsNull() {
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "01/01/2020", "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.getStartTime(), is(nullValue()));
+  public void toStringTest() {
+
+    System.out.println(call.toString());
   }
 
+  /**
+   * Tests the print info method that is used for text dumping
+   */
   @Test
-  public void testDateformat(){
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", "ABCd", "1:00 am", "01/01/2020", "1:00 am");
-   assertThat(call.validateJavaDate("ABCD"), containsString("Invalid Date format"));
-  }
-//
-  @Test(expected = NullPointerException.class)
-  public void testDateformatNull(){
-    PhoneCall call = new PhoneCall("503-449-7833", "345-876-3456", null, "1:00 am", "01/01/2020", "1:00 am");
-    assertThat(call.validateJavaDate(null), is(nullValue()));
-    //assertThat(call.validateJavaDate(null), containsString("Too many args"));
+  public void printInfoTest() {
+
+    assertThat(call.printInfo(), equalTo("Pranee 503-440-2707 503-645-3231 01/02/2014 22:45 01/02/2014 22:50"));
   }
 
+  /**
+   * Tests the not equal method for two phone calls
+   */
+  @Test
+  public void notEqual() {
+    PhoneCall call2 = new PhoneCall("likhi","503-440-2707","503-645-3231","01/02/2014","22:45","01/02/2014","22:50");
+    assertThat(call,not(equalTo(call2)));
+  }
 
 
-
-
-
-
-
-
-
-  
 }
