@@ -1,47 +1,54 @@
 package edu.pdx.cs410J.vanga;
 
-import edu.pdx.cs410J.AbstractPhoneBill;
+import edu.pdx.cs410J.AbstractPhoneCall;
 import edu.pdx.cs410J.PhoneBillDumper;
 
+import java.awt.datatransfer.Clipboard;
 import java.io.File;
+import java.io.FileWriter;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.util.ArrayList;
 
+/**
+ * TextDumper takes strings (PhoneBill) and outputs it to a text file or any other output file.
+ */
+public class TextDumper implements PhoneBillDumper<PhoneBill> {
 
-public class TextDumper implements PhoneBillDumper {
-    /**
-     * file name passed in cmd is stored here
-     */
-    String filename;
-
-    /**
-     * constructor
-     * @param fname
-     */
-    public TextDumper(String fname){
-        this.filename = fname;
+    @Deprecated
+    public void dump (PhoneBill calls) {
+        return;
     }
 
     /**
-     * implements overidden method to write to external file
-     * @param abstractPhoneBill
-     * @throws IOException
+     *
+     * @param calls PhoneBill that wants to be dumped
+     * @param filename filename to print the output to
      */
-    @Override
-    public void dump(AbstractPhoneBill abstractPhoneBill) throws IOException {
-        ArrayList arr1 = (ArrayList) abstractPhoneBill.getPhoneCalls();
-        String phoneCalls[] = new String[arr1.size()];
-        File f = new File(filename);
-        PrintWriter out = new PrintWriter(filename);
-        out.write("");
-        out.write(abstractPhoneBill.getCustomer());
-        for(int i = 0; i < arr1.size(); ++i){
-            System.out.println(arr1.get(i));
-            phoneCalls[i] = arr1.get(i).toString();
-            out.write("\n");
-            out.write(phoneCalls[i]);
+    public static void dump (PhoneBill calls, String filename) {
+
+        // Get the file name, with an exception if there was some error creating files.
+        File f1 = new File(filename);
+        try {
+            if (!f1.exists()) {
+                f1.createNewFile();
+            }
+        } catch (Exception e) {
+            System.out.println("Error creating new file");
         }
-        out.close();
+
+        // Create a print writer to print by line to the bill
+        try {
+            FileWriter fileWritter = new FileWriter(f1);
+            BufferedWriter bw = new BufferedWriter(fileWritter);
+            PrintWriter pw = new PrintWriter(bw);
+
+            for(PhoneCall call : calls.getPhoneCalls()) {
+                pw.println(call.printInfo());
+            }
+            pw.close();
+        } catch(Exception e){
+            throw new IllegalArgumentException("Cannot load file");
+        }
     }
 }
