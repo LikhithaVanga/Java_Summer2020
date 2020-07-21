@@ -1,67 +1,70 @@
 package edu.pdx.cs410J.vanga;
 
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.TreeSet;
+
 import edu.pdx.cs410J.AbstractPhoneBill;
 
-import java.util.Collection;
-import java.util.*;
-
+/**
+ * A PhoneBill has a customer name and consists of multiple PhoneCalls.
+ *
+ * @author Likhitha V
+ *
+ */
 public class PhoneBill extends AbstractPhoneBill<PhoneCall> {
 
     private String customer;
-    private List<PhoneCall> callList;
 
-    public PhoneBill () {
-        callList = new ArrayList<PhoneCall>();
-        customer = "";
+    private Collection<PhoneCall> phoneCalls;		// Collection is an Interface, need an implemented class
+
+    // a comparator for comparing 2 PhoneCall
+    static class phoneCallComparator implements Comparator<PhoneCall> {
+        public int compare(PhoneCall o1, PhoneCall o2) {
+            // sort by small to large, earliest to latest
+            return o1.compareTo(o2);
+        }
     }
 
-    public PhoneBill (PhoneCall initial) {
-        customer = initial.getCustomer();
-        callList = new ArrayList<PhoneCall>();
-        callList.add(initial);
+    public PhoneBill(String customer) throws IllegalArgumentException {
+        if (customer == null || customer.isEmpty()) {
+            throw new IllegalArgumentException("Customer name is invalid");
+        }
+
+        this.customer = customer;
+        this.phoneCalls = new TreeSet<PhoneCall>(new phoneCallComparator());	// auto sort when adding
+
+        // this.phoneCalls = new LinkedList<PhoneCall>();		// can add first or last, keep insertion order
     }
 
     /**
-     * Method to return the customer from a phone bill
-     * @return customer string
+     * Returns the name of the customer whose phone bill this is
+     *
+     * @return String
      */
     @Override
     public String getCustomer() {
-        return customer;
+        return this.customer;
     }
 
     /**
-     * Adds a phone call to a phone bill
-     * @param phoneCall
+     * Adds a phone call to this phone bill
+     * phone calls are sorted chronologically by their begin time + caller phone #
+     *
+     * @param call
+     *            A PhoneCall obj
      */
     @Override
-    public void addPhoneCall(PhoneCall phoneCall) {
-        if(customer.equals("")) {
-            customer = phoneCall.getCustomer();
-        }
-        callList.add(phoneCall);
+    public void addPhoneCall(PhoneCall call) {
+        this.phoneCalls.add(call);
     }
 
     /**
-     * Returns the list of phone calls in a phone bill
-     * @return callList
+     * Returns all of the phone calls (as instances of AbstractPhoneCall) in this phone bill
      */
     @Override
     public Collection<PhoneCall> getPhoneCalls() {
-        return callList;
+        return this.phoneCalls;
     }
 
-    /**
-     * Returns
-     * @param o
-     * @return Whether two phone bills are equal
-     */
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (!(o instanceof PhoneBill)) return false;
-        PhoneBill phoneBill = (PhoneBill) o;
-        return getCustomer().equals(phoneBill.getCustomer()) &&
-                callList.equals(phoneBill.callList);
-    }
 }

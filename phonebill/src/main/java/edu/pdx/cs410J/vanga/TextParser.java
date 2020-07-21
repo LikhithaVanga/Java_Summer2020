@@ -1,67 +1,107 @@
 package edu.pdx.cs410J.vanga;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+
+import edu.pdx.cs410J.ParserException;
 import edu.pdx.cs410J.PhoneBillParser;
 
-import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * A TextParser reads the contents of a text file and creates a phone bill with phone calls.
+ *
+ * @author Likhitha V
+ *
+ */
+public class TextParser implements PhoneBillParser<PhoneBill> {
 
-public class TextParser implements PhoneBillParser {
-
-    /**
-     * Helper function to parse a string into a string array
-     * @param line string to parse into string array
-     * @return string array to return
-     */
-    public static String[] parseCall (String line) {
-        String[] strArray = line.trim().split("\\s+");
-        if (strArray.length != 7) {
-            throw  new IllegalArgumentException("Line read in file was not a phone call format");
-        } else {
-            return strArray;
-        }
-    }
-
-    @Deprecated
-    public PhoneBill parse () {
-        return new PhoneBill(new PhoneCall("","","","","","",""));
-    }
+    private String filename;
 
     /**
-     * Parses a text file and returns a the phonebill of that text file
-     * @param filelocation string location of that file
-     * @return
+     * Create a TextParser by passing a filename to parse
+     *
+     * @param filename
+     * @throws IllegalArgumentException
      */
-    public static PhoneBill parse (String filelocation) {
+    public TextParser(String filename) throws IllegalArgumentException {
+        if (filename == null || filename.isEmpty()) {
+            throw new IllegalArgumentException("Filename is invalid in text parser");
+        }
 
-        String thisLine = null;
+        this.filename = filename;
+    }
 
-        List<String []> phoneStringLists = new ArrayList<String []>();
+    /**
+     * Parses some source and returns a phone bill
+     *
+     * @throws ParserException
+     * @return PhoneBill obj or null if no file found
+     */
+    @Override
+    public PhoneBill parse() throws ParserException {
+        FileReader fr = null;
+        PhoneBill bill = null;
 
         try {
-            FileReader fr = new FileReader(filelocation);
-            BufferedReader br = new BufferedReader(fr);
-
-            // Read all lines
-            while ((thisLine = br.readLine()) != null) {
-                phoneStringLists.add(parseCall(thisLine));
-            }
+            File file = new File(this.filename);
+            fr = new FileReader(file);
         }
-        catch(Exception e) {
-            // Return new phonebill if the file reader could not read any file
-            return new PhoneBill();
+        catch (FileNotFoundException e) {
+//			throw new ParserException("Error on finding target file to read");
+            // file doesn't exist, return null
+            return bill;
         }
 
-        PhoneBill returnPhoneBill = new PhoneBill();
+        BufferedReader br = null;
 
         try {
-            for (String[] phoneCallString : phoneStringLists) {
-                returnPhoneBill.addPhoneCall(new PhoneCall(phoneCallString[0], phoneCallString[1], phoneCallString[2], phoneCallString[3], phoneCallString[4], phoneCallString[5], phoneCallString[6]));
+            br = new BufferedReader(fr);
+
+            String line = br.readLine();
+
+            if (line != null) {
+                bill = new PhoneBill(line);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+
+            line = br.readLine();
+
+            while (line != null) {
+                String callParams[] = line.split("\\.\\.\\.");
+                if (callParams.length != 4) {
+                    throw new IllegalArgumentException("Need 4 arguemnts to create a PhoneCall");
+                }
+
+                PhoneCall call = new PhoneCall(callParams[0], callParams[1], callParams[2], callParams[3]);
+                bill.addPhoneCall(call);
+
+                line = br.readLine();
+                while (line != null && line.isEmpty()) {
+                    line = br.readLine();
+                }
+            }
         }
-        return returnPhoneBill;
+        catch (IOException e) {
+            throw new ParserException("Error on reading file content: " + e.getMessage());
+        }
+        catch (IllegalArgumentException e) {
+            throw new ParserException("Error on parsing file content: " + e.getMessage());
+        }
+        finally {
+            // closing
+            if (br != null) {
+                try {
+                    br.close();
+                }
+                catch (IOException x) {
+                    throw new ParserException("Error on closing buffer reader");
+                }
+            }
+        }
+
+
+        return bill;
     }
 
 }
