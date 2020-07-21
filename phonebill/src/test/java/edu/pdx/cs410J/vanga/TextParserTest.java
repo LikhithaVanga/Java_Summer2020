@@ -1,62 +1,200 @@
 package edu.pdx.cs410J.vanga;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-
-
-
-import static org.hamcrest.CoreMatchers.*;
+import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+
+import org.junit.Test;
+
+import edu.pdx.cs410J.ParserException;
+
+/**
+ * Unit tests for the {@link TextParser} class.
+ *
+ */
 public class TextParserTest {
-    public PhoneCall phoneCall1;
-    public PhoneCall phoneCall2;
-    public PhoneBill phoneBill3;
 
-    @Before
-    public void runSetup () {
-        phoneCall1 = new PhoneCall("Likhi", "503-440-2707", "503-645-3231","07/01/2019", "01:23", "07/01/2019", "01:24");
-        phoneCall2 = new PhoneCall("Vanga", "503-440-2707", "503-645-3231","07/01/2019", "01:23", "07/01/2019", "01:24");
-        phoneBill3 = new PhoneBill();
-        phoneBill3.addPhoneCall(phoneCall1);
-        phoneBill3.addPhoneCall(phoneCall2);
-        TextDumper.dump(phoneBill3,"PhoneBill2.txt");
+    public static void fileWriter(String content) throws FileNotFoundException {
+        File file = new File("temp.txt");
+        file.deleteOnExit();
+
+        PrintWriter pw = new PrintWriter(file);
+
+        if (content != null)
+            pw.println(content);
+
+        pw.close();
     }
 
-    /**
-     * Tests readme as a resource
-     * @throws IOException
-     */
+    // ------------------------------- Error Tests ------------------------------------- //
+
+    @Test(expected = IllegalArgumentException.class)
+    public void filenameEmptyThrowsException() throws IllegalArgumentException {
+        new TextParser("");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void filenameNullThrowsException() throws IllegalArgumentException {
+        new TextParser(null);
+    }
+
+
     @Test
-    public void readmeCanBeReadAsResource() throws IOException {
-        try (
-                InputStream readme = Project2.class.getResourceAsStream("README.txt");
-        ) {
-            assertThat(readme, not(nullValue()));
-            BufferedReader reader = new BufferedReader(new InputStreamReader(readme));
-            String line = reader.readLine();
-            assertThat(line, containsString("This is a README file!"));
-        }
+    public void fileNotFoundReturnNull() throws ParserException {
+        String filename = "not.exist";
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+        assertThat(bill, is(nullValue()));
+    }
+
+    @Test(expected = ParserException.class)
+    public void fileFoundWrongFormatThrowsException1() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "\n" +
+                "111-111-1111...111-111-1112...1/15/2020 12:35 am...1/15/2020 12:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        parser.parse();
+    }
+
+    @Test(expected = ParserException.class)
+    public void fileFoundWrongFormatThrowsException2() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1113...111-111-1112...0/15/2020 19:35 am...1/15/2020 19:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        parser.parse();
+    }
+
+    @Test(expected = ParserException.class)
+    public void fileFoundWrongFormatThrowsException3() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1113111-111-1112...0/15/2020 19:35 am...1/15/2020 19:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        parser.parse();
+    }
+
+    @Test(expected = ParserException.class)
+    public void fileFoundWrongFormatThrowsException4() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        parser.parse();
+    }
+
+    @Test(expected = ParserException.class)
+    public void fileFoundWrongFormatThrowsException5() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1113111-111-1112...0/15/2020 19:35am...1/15/2020 19:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        parser.parse();
     }
 
 
+    // ------------------------------- Success Tests ------------------------------------- //
 
-    /**
-     * Loads a file that has two lines and tests that it works
-     */
     @Test
-    public void loadTwoFile() {
-        PhoneBill testBill = TextParser.parse("PhoneBill2.txt");
-        assertThat(testBill.getCustomer(),equalTo("Likhi"));
-        PhoneBill test2Bill = new PhoneBill();
-        test2Bill.addPhoneCall(phoneCall1);
-        test2Bill.addPhoneCall(phoneCall2);
-        assertThat(testBill, equalTo(test2Bill));
+    public void fileFoundNoContentReturnNull() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = null;
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+        assertThat(bill, is(nullValue()));
     }
 
+    public void fileExistWithOnlyCustomerName() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+
+        assertThat(bill.toString(), containsString("abc's phone bill with 0 phone calls"));
+    }
+
+    @Test
+    public void fileExistFormatCorrectPassTest1Call() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1111...111-111-1112...1/15/2020 11:35 am...1/15/2020 11:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+
+        assertThat(bill.toString(), containsString("abc's phone bill with 1 phone calls"));
+
+
+    }
+
+    @Test
+    public void fileExistFormatCorrectPassTest2Calls() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1111...111-111-1112...1/15/2020 11:35 am...1/15/2020 11:39 am\n" +
+                "111-111-1113...111-111-1114...1/15/2020 11:35 am...1/15/2020 11:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+
+        assertThat(bill.toString(), containsString("abc's phone bill with 2 phone calls"));
+
+
+    }
+
+    @Test
+    public void fileExistFormatCorrectPassTest2Calls2Newlines() throws ParserException, FileNotFoundException {
+        String filename = "temp.txt";
+        String content = "abc\n" +
+                "111-111-1111...111-111-1112...1/15/2020 11:35 am...1/15/2020 11:39 am\n\n" +
+                "111-111-1113...111-111-1114...1/15/2020 11:35 am...1/15/2020 11:39 am";
+
+        // write content
+        fileWriter(content);
+
+        TextParser parser = new TextParser(filename);
+        PhoneBill bill = parser.parse();
+
+        assertThat(bill.toString(), containsString("abc's phone bill with 2 phone calls"));
+
+
+    }
 }
