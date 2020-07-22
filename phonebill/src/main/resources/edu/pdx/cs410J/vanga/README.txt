@@ -1,1 +1,1 @@
-This is a README file!
+This is a PhoneBill project that takes customer's name, caller phone number, callee phone number, start time, end time as parameters, then output the result PhoneBill information.
