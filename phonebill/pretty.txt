@@ -1,0 +1,20 @@
+Customer: abc
+
+Total calls: 3
+
+Called from 111-111-1113 to 111-111-1112
+         +- Mon, 15 Jan 1000 11:39 AM
+         |  536505116 minutes
+         +- Sat, 15 Feb 2020 11:35 AM
+
+Called from 111-111-1113 to 111-111-1112
+         +- Mon, 15 Jan 1000 11:50 AM
+         |  536505105 minutes
+         +- Sat, 15 Feb 2020 11:35 AM
+
+Called from 111-111-1112 to 111-222-2222
+         +- Wed, 15 Jan 2020 11:35 AM
+         |  658 minutes
+         +- Wed, 15 Jan 2020 10:33 PM
+
+
