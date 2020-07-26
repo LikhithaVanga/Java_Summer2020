@@ -1,161 +1,307 @@
 package edu.pdx.cs410J.vanga;
 
-import edu.pdx.cs410J.AbstractPhoneCall;
-
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.regex.Pattern;
+import java.util.Locale;
+import java.util.Objects;
 
-import static java.time.format.DateTimeFormatter.ofPattern;
+import edu.pdx.cs410J.AbstractPhoneCall;
 
-public class PhoneCall<pattern, TIME12HOURS_PATTERN> extends AbstractPhoneCall {
-  private final String Start_time;
-  private final String End_time;
-  /**
-   * Stores the caller's phone number in the format xxx-xxx-xxxx.
-   */
-  private String Caller;
-  /**
-   * Stores the callee's phone number in the format xxx-xxx-xxxx.
-   */
-  private String Callee;
-  /**
-   * Stores the start date and time of the phone call in the format MM/dd/yyyy hh:mm (am/pm).
-   */
-  private String Start;
-  /**
-   * Stores the end date and time of the phone call in the format MM/dd/yyyy hh:mm (am/pm).
-   */
-  private String Stop;
+/**
+ * A PhoneCall is initiated by a person with a given phone number at a given time
+ *
+ * @author Likhitha V
+ *
+ */
+public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall> {
 
-  /**
-   * Phone number pattern
-   */
-  public static final Pattern NumPattern = Pattern.compile("\\d{3}-\\d{3}-\\d{4}");
+  public final static String PARSE_DATE_PATTERN = "MM/dd/yyyy h:mm a";
 
+  private String callerPhoneNumber;
 
-  /**
-   * constructor
-   * @param callerNum
-   * @param calleeNum
-   * @param start
-   * @param timeStart
-   * @param stop
-   * @param timeEnd
-   */
-  public PhoneCall(String callerNum, String calleeNum, String start, String timeStart, String stop, String timeEnd){
-    this.Caller = validateNumber(callerNum);
-    this.Callee = validateNumber(calleeNum);
-    this.Start = validateJavaDate(start);
-    this.Stop = validateJavaDate(stop);
-    this.Start_time = timeStart;
-    this.End_time = timeEnd;
-  }
+  private String calleePhoneNumber;
 
-  /**
-   *
-   * @param input the phone number
-   * @return the phone number if in correct format or returns Invalid number
-   */
-  private String validateNumber(String input){
-    var matcher = NumPattern.matcher(input);
+  private Date startTime;
 
-    if (!matcher.matches()) {
-      System.out.println("Invalid phone number: " + input);
-      return "Invalid ###";
-    }
-    else{
-      return input;
-    }
+  private Date endTime;
+
+  public PhoneCall() {
 
   }
 
-  /**
-   *
-   * @param strDate the date call was initiated
-   * @return returns date if in correct format or null in incorrect
-   */
-  public static String validateJavaDate(String strDate)
-  {
-    /* Check if date is 'null' */
-    if (strDate.trim().equals(""))
-    {
-      return "";
+  public PhoneCall(String callerPhone, String calleePhone, String startTime, String endTime) throws IllegalArgumentException {
+    this.callerPhoneNumber = validatePhone(callerPhone);
+    this.calleePhoneNumber = validatePhone(calleePhone);
+
+    String startTimeStr = validateTime(startTime);
+    String endTimeStr = validateTime(endTime);
+
+    this.startTime = parseDate(startTimeStr);
+    this.endTime = parseDate(endTimeStr);
+
+    if (this.callerPhoneNumber.equals(this.calleePhoneNumber)) {
+      throw new IllegalArgumentException("Caller phone number equals to callee phone number");
     }
-    /* Date is not 'null' */
-    else
-    {
-      SimpleDateFormat sdfrmt = new SimpleDateFormat("MM/dd/yyyy");
-      sdfrmt.setLenient(false);
-      try
-      {
-        Date javaDate = sdfrmt.parse(strDate);
+
+    if (this.endTime.compareTo(this.startTime) < 0) {
+      throw new IllegalArgumentException("Phone call's end time is before its starts time");
+    }
+  }
+
+  /**
+   * parse a date String into a java.util.Date obj
+   *
+   * @param dateString
+   *            A date's format string
+   * @return A Date obj
+   * @throws ParseException
+   */
+  public Date parseDate(String dateString) throws IllegalArgumentException {
+    // need locale, otherwise not work on other machines
+    DateFormat dateFormat = new SimpleDateFormat(PARSE_DATE_PATTERN, Locale.US);
+    Date date = null;
+    try {
+      date = dateFormat.parse(dateString);
+    }
+    catch (ParseException e) {
+      throw new IllegalArgumentException("Invalid format on the day or time: " + e.getMessage());
+    }
+
+//		assertEquals(date2.toString(), "Sat Jan 01 00:00:00 PST 2000");
+
+    return date;
+  }
+
+  /**
+   * Returns the phone number of the person who originated this phone call.
+   *
+   * @return String
+   */
+  @Override
+  public String getCaller() {
+    return this.callerPhoneNumber;
+  }
+
+  /**
+   * Returns the phone number of the person who received this phone call.
+   *
+   * @return String
+   */
+  @Override
+  public String getCallee() {
+    return this.calleePhoneNumber;
+  }
+
+  /**
+   * Returns a textual representation of the time that this phone call was originated.
+   *
+   * @return String
+   */
+  @Override
+  public String getStartTimeString() {
+//		String formattedDate = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).format(this.startTime);
+    String formattedDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.US).format(this.startTime);
+
+    //		assertEquals(formattedDate, "1973/03/03"); // in windows
+//		assertEquals(formattedDate, "3/3/73"); // in linux
+
+    return formattedDate;
+  }
+
+  /**
+   * Returns a textual representation of the time that this phone call
+   * was completed.
+   *
+   * @return String
+   */
+  @Override
+  public String getEndTimeString() {
+//		String formattedDate = DateFormat.getDateInstance(DateFormat.SHORT, Locale.US).format(this.endTime);
+    String formattedDate = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.US).format(this.endTime);
+
+//		assertEquals(formattedDate, "1973/03/03"); // in windows
+//		assertEquals(formattedDate, "3/3/73"); // in linux
+
+    return formattedDate;
+  }
+
+  /**
+   * Returns the time that this phone call was originated as a
+   * {@link Date}.
+   */
+  public Date getStartTime() {
+    return this.startTime;
+  }
+
+  /**
+   * Returns the time that this phone call was completed as a
+   * {@link Date}.
+   */
+  public Date getEndTime() {
+    return this.endTime;
+  }
+
+  /**
+   * compare this PhoneCall with another PhoneCall
+   *
+   * @param call
+   *            another call to be compared.
+   * @return 0 if the argument phone call is equal to this phone call;
+   *         -1 if this call is before the call argument;
+   *         1 if this call is after the call argument.
+   * @throws NullPointerException
+   *             if another call is null.
+   */
+  @Override
+  public int compareTo(PhoneCall call) throws NullPointerException {
+    Objects.requireNonNull(call);
+
+    int timeDiff = this.startTime.compareTo(call.getStartTime());
+    if (timeDiff > 0) {
+      return 1;
+    }
+    else if (timeDiff < 0) {
+      return -1;
+    }
+    else {
+      int phoneDiff = this.callerPhoneNumber.compareTo(call.getCaller());
+      if (phoneDiff > 0)
+        return 1;
+      else if (phoneDiff < 0)
+        return -1;
+      else
+        return 0;
+    }
+  }
+
+  /**
+   * validate phone number of format nnn-nnn-nnnn
+   *
+   * @param phone
+   * @return original phone number
+   * @throws IllegalArgumentException
+   */
+  private String validatePhone(String phone) throws IllegalArgumentException {
+    String phones[] = phone.split("-");
+    if (phones.length != 3) {
+      throw new IllegalArgumentException("Invalid phone argument");
+    }
+
+    String fi = phones[0];
+    String se = phones[1];
+    String th = phones[2];
+
+    try {
+      int fir = Integer.parseInt(fi);
+      if (fi.length() != 3) {
+        throw new Exception();
       }
-      /* Date format is invalid */
-      catch (ParseException e)
-      {
-        System.out.println(strDate+" is Invalid Date format");
-        return "";
+
+      int sec = Integer.parseInt(se);
+      if (se.length() != 3) {
+        throw new Exception();
       }
-      return strDate;
+
+      int thi = Integer.parseInt(th);
+      if (th.length() != 4) {
+        throw new Exception();
+      }
     }
-  }
-
-  /**
-   *
-   * @return returns the caller number
-   */
-  @Override
-  public String getCaller()
-  {
-    return Caller;
-    //throw new UnsupportedOperationException("This method is not implemented yet");
-  }
-
-  /**
-   *
-   * @return the calee phone number
-   */
-  @Override
-  public String getCallee()
-  {
-    return Callee;
-  }
-
-  /**
-   *
-   * @return the concatinated start date and time call was made
-   */
-  @Override
-  public String getStartTimeString()
-  {
-    if(this.Start == "" || this.Start_time == "")
-    {
-      throw new UnsupportedOperationException("Invalid Date format");
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid phone argument");
     }
-    else{
-      return Start.concat(" ").concat(Start_time);
-    }
+
+
+    return phone;
   }
 
   /**
+   * validate time of format mm/dd/yyyy hh:mm
    *
-   * @return the concatinated end date and time call was made
+   * @param dateTime
+   * @return original datatime
+   * @throws IllegalArgumentException
    */
-  @Override
-  public String getEndTimeString()
-  {
-    return Stop.concat(" ").concat(End_time);
-  }
+  private String validateTime(String dateTime) throws IllegalArgumentException {
+    String dateTimeStr[] = dateTime.split(" ");
+    if (dateTimeStr.length != 3) {
+      throw new IllegalArgumentException("Need date, time and am/pm marker argument");
+    }
 
-  /**
-   * Prints call details to screen
-   */
-  public void printCaller()
-  {
-    if(this.Caller != "Invalid ###" && this.Callee != "Invalid ###")
-      System.out.println(toString());
+    String date = dateTimeStr[0];
+    String dateStr[] = date.split("/");
+    if (dateStr.length != 3) {
+      throw new IllegalArgumentException("Invalid format of date argument");
+    }
+
+    String m = dateStr[0];
+    String d = dateStr[1];
+    String y = dateStr[2];
+
+    try {
+      int mm = Integer.parseInt(m);
+      if (m.length() > 2 || mm > 12 || mm < 1) {
+        throw new Exception();
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid month argument");
+    }
+
+    try {
+      int dd = Integer.parseInt(d);
+      if (d.length() > 2 || dd > 31 || dd < 1) {
+        throw new Exception();
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid day argument");
+    }
+
+    try {
+      int yy = Integer.parseInt(y);
+      if (y.length() > 4 || yy > 9999 || yy == 0) {
+        throw new Exception();
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid year argument");
+    }
+
+
+
+    String time = dateTimeStr[1];
+    String timeStr[] = time.split(":");
+    if (timeStr.length != 2) {
+      throw new IllegalArgumentException("Invalid format of time argument ");
+    }
+
+    String h = timeStr[0];
+    String mi = timeStr[1];
+
+    try {
+      int hh = Integer.parseInt(h);
+      if (hh > 12 || hh < 1) {
+        throw new Exception();
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid hour argument");
+    }
+
+    try {
+      int min = Integer.parseInt(mi);
+      if (min > 59 || min < 0) {
+        throw new Exception();
+      }
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("Invalid minute argument");
+    }
+
+    return dateTime;
   }
 
 }
