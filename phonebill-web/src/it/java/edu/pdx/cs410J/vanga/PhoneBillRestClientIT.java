@@ -33,8 +33,9 @@ public class PhoneBillRestClientIT
   }
 
 
+
   @Test(expected = NoSuchPhoneBillException.class)
-  public void testEmptyServerThrowsNoSuchPhoneBillException() throws IOException
+  public void testEmptyServerThrowsNoSuchPhoneBillException() throws IOException, PhoneBillRestException
   {
     PhoneBillRestClient client = newPhoneBillRestClient();
     client.removeAllPhoneBills();
@@ -137,11 +138,24 @@ public class PhoneBillRestClientIT
   }
 
   @Test
-  public void test4MissingRequiredParameterReturnsPreconditionFailed() throws IOException
+  public void test4MissingRequiredParameterReturnsPreconditionFailed() throws IOException, PhoneBillRestException
   {
     PhoneBillRestClient client = newPhoneBillRestClient();
     HttpRequestHelper.Response response = client.postToMyURL(Map.of());
     assertThat(response.getContent(), containsString(Messages.missingRequiredParameter("customer")));
     assertThat(response.getCode(), equalTo(HttpURLConnection.HTTP_PRECON_FAILED));
+
+
+
   }
+
+  @Test
+  public void testPhoneBillRestException() throws IOException, PhoneBillRestException
+  {
+    int code = 500;
+    PhoneBillRestException error = new PhoneBillRestException(code);
+    assertThat(error.toString(), containsString("HTTP Status Code"));
+  }
+
+
 }

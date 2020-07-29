@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
 import java.util.Collection;
 import java.util.Date;
 
@@ -112,5 +113,53 @@ public class PhoneBillServletTest
     verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
     verify(mockPrintWriter).println(customer);
     verify(mockPrintWriter).println(call.toString());
+  }
+
+
+  @Test
+  public void getReturnsPrettyPhoneBillWithinRange() throws IOException, ServletException, ParseException {
+    PhoneBillServlet servlet = new PhoneBillServlet();
+
+    String customer = "Customer";
+    PhoneBill bill = new PhoneBill(customer);
+    String startTime1 = "01/27/2018 8:56 am";
+    String endTime1 = "02/27/2018 10:27 am";
+
+    String startTime2 = "02/02/2018 9:00 am";
+    String endTime2 = "02/20/2018 10:00 pm";
+
+    String startTime3 = "02/10/2018 10:00 pm";
+    String endTime3 = "02/15/2018 6:00 am";
+
+    String startRange = "02/01/2018 6:00 am";
+    String endRange = "02/21/2018 10:00 pm";
+
+
+
+    PhoneCall call1 = new PhoneCall("123-456-7890", "234-456-6789", startTime1, endTime1);
+    PhoneCall call2 = new PhoneCall("123-456-7890", "234-456-6789", startTime2, endTime2);
+    PhoneCall call3 = new PhoneCall("123-456-7890", "234-456-6789", startTime3, endTime3);
+    bill.addPhoneCall(call1);
+    bill.addPhoneCall(call2);
+    bill.addPhoneCall(call3);
+    servlet.addPhoneBill(bill);
+
+    HttpServletRequest mockRequest = mock(HttpServletRequest.class);
+    HttpServletResponse mockResponse = mock(HttpServletResponse.class);
+    PrintWriter mockPrintWriter = mock(PrintWriter.class);
+
+    when(mockResponse.getWriter()).thenReturn(mockPrintWriter);
+
+    when(mockRequest.getParameter(CUSTOMER_PARAMETER)).thenReturn("Customer");
+    when(mockRequest.getParameter("startTime")).thenReturn(startRange);
+    when(mockRequest.getParameter("endTime")).thenReturn(endRange);
+
+    servlet.doGet(mockRequest, mockResponse);
+
+    verify(mockResponse).setStatus(HttpServletResponse.SC_OK);
+    verify(mockPrintWriter).println(customer);
+    verify(mockPrintWriter, never()).println(call1.toString());
+    verify(mockPrintWriter).println(call2.toString());
+    verify(mockPrintWriter).println(call3.toString());
   }
 }

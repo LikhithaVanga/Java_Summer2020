@@ -130,19 +130,17 @@ public class PhoneBillRestClient extends HttpRequestHelper
         return response;
     }
 
-    /**
-     * Class for PhoneBillRestException
-     */
-    private class PhoneBillRestException extends RuntimeException
-    {
-        /**
-         * Constructor for PhoneBillRestException
-         * @param httpStatusCode
-         */
-        public PhoneBillRestException(int httpStatusCode)
-        {
-            super("Got an HTTP Status Code of " + httpStatusCode);
-        }
-    }
+
+//    /**
+//     * Class for PhoneBillRestException
+//     */
+//    @VisibleForTesting
+//    private class PhoneBillRestException extends RuntimeException
+//    {
+//        public PhoneBillRestException(int httpStatusCode)
+//        {
+//            super("Got an HTTP Status Code of " + httpStatusCode);
+//        }
+//    }
 
 }

@@ -1,4 +1,4 @@
-package edu.pdx.cs410J.vanga;
-
-public class TextDumer {
-}
+//package edu.pdx.cs410J.vanga;
+//
+//public class TextDumper {
+//}
