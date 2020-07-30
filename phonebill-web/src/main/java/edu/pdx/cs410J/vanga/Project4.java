@@ -1,9 +1,8 @@
 package edu.pdx.cs410J.vanga;
 
-import edu.pdx.cs410J.web.HttpRequestHelper;
-
-import java.io.IOException;
-import java.io.PrintStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 /**
  * The main class that parses the command line and communicates with the
@@ -11,10 +10,6 @@ import java.io.PrintStream;
  */
 public class Project4
 {
-
-    static final String README =
-            "\nProject 4 README by Likhitha for CS510J Summer 2020\n" +
-                    "This project continues Project 3, exposing it as a web service.\n\n";
     static final String USAGE =
             "usage: java edu.pdx.cs410J.<login-id>.Project4 [options] <args>\n" +
                     "  args are (in this order):\n" +
@@ -30,6 +25,39 @@ public class Project4
                     "\t-print          Prints a description of the new phone call\n" +
                     "\t-README         Prints a README for this project and exits\n\n";
 
+    public static void printline(String textDumper){
+
+        String lines[] = textDumper.split("\n");
+        if(lines.length>1) {
+            for (int i = 1; i < lines.length; i++) {
+                String argument[] = lines[i].split(" ");
+                String start = argument[2] + " " + argument[3] + " " + argument[4];
+                String end = argument[5] + " " + argument[6] + " " + argument[7];
+                Date startDate = new Date();
+                Date endDate = new Date();
+                String dur;
+                SimpleDateFormat sd = new SimpleDateFormat("MM/dd/yyyy, hh:mm aa");
+//                try {
+//                    startDate = sd.parse(start);
+//                    endDate = sd.parse(end);
+//                } catch (ParseException e) {
+//                    System.out.println("could not convert date");
+//                }
+                long duration = startDate.getTime() - endDate.getTime();
+                long diffMinutes = duration / (60 * 1000) % 60;
+                long diffHours = duration / (60 * 60 * 1000);
+                if (diffHours == 0)
+                    dur = " " + -1 * diffMinutes + " minutes";
+                else
+                    dur = "  " + -1 * diffHours + "hr and " + -1 * diffMinutes + "min";
+
+                String result = "Phone call from " + argument[0] + " to " + argument[1] + " from " + start + " to " + end;
+                System.out.println(result);
+            }
+        }
+    }
+
+
     /**
      * Main function for Project 4
      * @param args Takes in arguments from the command line
@@ -39,12 +67,12 @@ public class Project4
     {
         try
         {
-            Cli cli = new Cli(args);
+            commandLineArgs cli = new commandLineArgs(args);
 
             // 1. Show README and exit
             if (cli.readme)
             {
-                System.out.println(README + USAGE);
+                System.out.println(USAGE);
                 System.exit(0);
             }
             // 2. Search
@@ -53,7 +81,7 @@ public class Project4
                 PhoneBillRestClient client = new PhoneBillRestClient(cli.hostname, cli.portNumber);
 
                 String message = client.searchPhoneCalls(cli.customer, cli.startTime, cli.endTime);
-                System.out.println(message);
+                printline(message);
                 System.exit(0);
             }
             // 3. Get all calls for customer
@@ -63,7 +91,8 @@ public class Project4
             {
                 PhoneBillRestClient client = new PhoneBillRestClient(cli.hostname, cli.portNumber);
                 String message = client.getPrettyPhoneBill(cli.customer);
-                System.out.println(message);
+
+                printline(message);
                 System.exit(0);
             }
             // 4. Add Phone Call

@@ -2,18 +2,18 @@ package edu.pdx.cs410J.vanga;
 
 import edu.pdx.cs410J.AbstractPhoneCall;
 
-import java.text.SimpleDateFormat;
+
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Objects;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.time.ZoneId;
-import java.time.LocalDate;
 
-/**
- * The Class that manages a phone call
- */
 public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall>
 {
     private static String DATE_TIME_FORMAT = "M/d/yyyy h:mm a";
@@ -21,7 +21,6 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
 
     private final String callerNumber;
     private final String calleeNumber;
-
     private final Date startTime;
     private final Date endTime;
 
@@ -39,7 +38,6 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
         this.calleeNumber = calleeNum;
         this.startTime = parseDate(start);
         this.endTime = parseDate(end);
-
         this.validate();
     }
 
@@ -124,6 +122,7 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
 
         this.validateDate(this.startTime);
         this.validateDate(this.endTime);
+        this.validateDuration(this.startTime,this.endTime);
     }
 
     /**
@@ -173,6 +172,13 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
         }
     }
 
+    private void validateDuration(Date start, Date end) throws PhoneBillException
+    {
+        if(end.getTime() -start.getTime()<0){
+            throw new PhoneBillException("End time should be after start time.");
+        }
+    }
+
     //// Private Methods ///////////////////////
 
     /**
@@ -205,6 +211,16 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
         }
     }
 
+    public String duration(){
+        long duration =startTime.getTime()-endTime.getTime();
+        long diffMinutes = duration / (60 * 1000) % 60;
+        long diffHours = duration / (60 * 60 * 1000);
+        if(diffHours ==0)
+            return " "+-1*diffMinutes + " minutes";
+        else
+            return "  "+-1*diffHours+"hr and "+ -1*diffMinutes +"min";
+    }
+
     /**
      * Gets the Start Date/Time
      * @return Date Ojbect
@@ -222,4 +238,9 @@ public class PhoneCall extends AbstractPhoneCall implements Comparable<PhoneCall
     {
         return this.endTime;
     }
+/*
+    public String getDateShort(Date input){
+        String dateShort = DateFormat.getDateTimeInstance(DateFormat.SHORT,DateFormat.SHORT).format(input);
+        return dateShort;
+    }*/
 }

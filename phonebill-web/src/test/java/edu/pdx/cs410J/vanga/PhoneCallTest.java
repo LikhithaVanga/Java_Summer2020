@@ -1,59 +1,41 @@
 package edu.pdx.cs410J.vanga;
 
-import edu.pdx.cs410J.ParserException;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
-import java.util.Date;
-
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.hamcrest.MatcherAssert.assertThat;
-
-/**
- * Unit tests for the {@link PhoneCall} class.
- */
 public class PhoneCallTest {
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
-
-    private final String validPhoneNumber = "503-333-3333";
-    private final String validTime = "1/15/2031 2:33 AM";
-
-    private PhoneCall getPhoneCall() throws ParserException {
-        return new PhoneCall(validPhoneNumber, validPhoneNumber, validTime, validTime);
-    }
 
     @Test
-    public void getStartTimeStringNeedsToBeImplemented() throws ParserException {
-        PhoneCall call = getPhoneCall();
-        assertThat(call.getStartTimeString(), not(nullValue()));
+    public void test1(){
+    PhoneCall call = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+        PhoneCall call1 = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+    call.compareTo(call1);
     }
 
+    @Test(expected = PhoneBillException.class)
+    public void test2(){
+        PhoneCall call = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 09:00 AM");
+        //PhoneCall call1 = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+        //call.compareTo(call1);
+    }
+    @Test(expected = PhoneBillException.class)
+    public void test3(){
+        PhoneCall call = new PhoneCall("123123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 09:00 AM");
+        //PhoneCall call1 = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+        //call.compareTo(call1);
+    }
+
+    @Test(expected = PhoneBillException.class)
+    public void test4(){
+        PhoneCall call = new PhoneCall("123123-1234","098-098-1234","10/10/3020 10:00 AM","10/10/2020 09:00 AM");
+        //PhoneCall call1 = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+        //call.compareTo(call1);
+    }
     @Test
-    public void getCallerNeedsToBeImplemented() throws ParserException {
-        PhoneCall call = getPhoneCall();
-        assertThat(call.getCaller(), not(nullValue()));
+    public void test5(){
+        PhoneCall call = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 08:00 AM","10/10/2020 10:00 AM");
+        //PhoneCall call1 = new PhoneCall("123-123-1234","098-098-1234","10/10/2020 10:00 AM","10/10/2020 11:00 AM");
+        //call.compareTo(call1);
+        String dur = call.duration();
     }
-
-    @Test
-    public void getCalleeNeedsToBeImplemented() throws ParserException {
-        PhoneCall call = getPhoneCall();
-        assertThat(call.getCallee(), not(nullValue()));
-    }
-
-    @Test
-    public void passingInvalidPhoneNumberFails() throws Exception {
-        thrown.expect(Exception.class);
-        new PhoneCall("cat", "dog", validTime, validTime);
-    }
-
-    @Test
-    public void passingInvalidDateFails() throws Exception {
-        thrown.expect(Exception.class);
-        new PhoneCall(validPhoneNumber, validPhoneNumber, "cat", "dog");
-    }
-
-
 }
+

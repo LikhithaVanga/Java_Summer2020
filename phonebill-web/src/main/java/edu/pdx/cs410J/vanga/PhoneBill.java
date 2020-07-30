@@ -1,16 +1,15 @@
 package edu.pdx.cs410J.vanga;
 
 import edu.pdx.cs410J.AbstractPhoneBill;
+import edu.pdx.cs410J.AbstractPhoneCall;
 
-import java.nio.file.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-/**
- * The class that manages a phone bill
- */
 public class PhoneBill extends AbstractPhoneBill<PhoneCall>
 {
     private String customer;
@@ -38,14 +37,14 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall>
      * @param filePath
      * @throws PhoneBillException
      */
-    public PhoneBill(String customerName, String filePath) throws PhoneBillException
+   /* public PhoneBill(String customerName, String filePath) throws PhoneBillException
     {
         this.customer = customerName;
         this.customerFromFile = null;
         this.filePath = Paths.get(filePath);
 
         this.validateCustomerName();
-    }
+    }*/
 
     /**
      * Constructor for PhoneBill - Takes a Customer Name and FilePath
@@ -54,14 +53,14 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall>
      * @param filePath
      * @throws PhoneBillException
      */
-    public PhoneBill(String customerFromCli, String customerFromFile, String filePath) throws PhoneBillException
+    /*public PhoneBill(String customerFromCli, String customerFromFile, String filePath) throws PhoneBillException
     {
         this.customer = customerFromCli;
         this.customerFromFile = customerFromFile;
         this.filePath = Paths.get(filePath);
 
         this.compareCustomerNames();
-    }
+    }*/
 
     /**
      * Adds a PhoneCall object to a phone bill
@@ -107,8 +106,8 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall>
                 // NOTE: Criteria for search:
                 // if start date falls within search start and end,
                 // it will be returned, regardless of end date
-                if (call.getStartTime().after(start) &&
-                        call.getStartTime().before(end))
+                if (  ((call.getStartTime().after(start)) || (call.getStartTime().compareTo(start)==0)) &&
+                        (( call.getStartTime().before(end)) || (call.getStartTime().compareTo(end)==0)) )
                 {
                     filteredCalls.add(call);
                 }
@@ -122,21 +121,6 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall>
         }
     }
 
-    /**
-     * Gets the Total Minutes of all calls in a phone bill
-     * @return int of total minutes of phone bill
-     * @throws ParseException throw if the total can't be summed
-     */
-    public int getTotalMinutes() throws ParseException
-    {
-        int total = 0;
-
-        for (PhoneCall call : this.calls)
-        {
-            total += GetDateDiffMinutes(call.getStartTimeString(), call.getEndTimeString());
-        }
-        return total;
-    }
 
     /** Gets the Customer name of a phone bill
      * @return String Customer Name from the Phone Bill
@@ -153,24 +137,6 @@ public class PhoneBill extends AbstractPhoneBill<PhoneCall>
     public Path getFilePath()
     {
         return this.filePath;
-    }
-
-    /**
-     * Gets the different between two dates
-     * @param d1 String of the 1st Date
-     * @param d2 String of the 2nd Date
-     * @return int representing difference between two dates in minutes.
-     * @throws ParseException thrown if the dates can't be parsed
-     */
-    private int GetDateDiffMinutes(String d1, String d2) throws ParseException
-    {
-        Date startDate = parseDate(d1);
-        Date endDate   = parseDate(d2);
-
-        long duration  = endDate.getTime() - startDate.getTime();
-        int diffInMinutes = (int) TimeUnit.MILLISECONDS.toMinutes(duration);
-
-        return diffInMinutes;
     }
 
     /**

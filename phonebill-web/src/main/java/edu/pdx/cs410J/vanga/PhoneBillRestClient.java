@@ -1,14 +1,15 @@
 package edu.pdx.cs410J.vanga;
 
-
 import com.google.common.annotations.VisibleForTesting;
+import edu.pdx.cs410J.ParserException;
 import edu.pdx.cs410J.web.HttpRequestHelper;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.util.Map;
 
-import static java.net.HttpURLConnection.HTTP_NOT_FOUND;
-import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.*;
+
 
 /**
  * A helper class for accessing the rest client.  Note that this class provides
@@ -55,13 +56,13 @@ public class PhoneBillRestClient extends HttpRequestHelper
      * @param call
      * @throws IOException
      */
-    public void addPhoneCall(String customerName, PhoneCall call) throws IOException
+    public void addPhoneCall(String customerName, PhoneCall call) throws IOException,PhoneBillException
     {
         Map postParameters = Map.of("customer", customerName,
                 "caller", call.getCaller(),
                 "callee", call.getCallee(),
-                "startTime", call.getStartTimeString(),
-                "endTime", call.getEndTimeString());
+                "start", call.getStartTimeString(),
+                "end", call.getEndTimeString());
 
 
 
@@ -72,17 +73,17 @@ public class PhoneBillRestClient extends HttpRequestHelper
     /**
      * Search phone calls between startTimeAndDate and endTimeAndDate
      * @param customer
-     * @param startTime
-     * @param endTime
+     * @param start
+     * @param end
      * @return
      * @throws IOException
      */
-    public String searchPhoneCalls(String customer, String startTime, String endTime) throws IOException
+    public String searchPhoneCalls(String customer, String start, String end) throws IOException
     {
         Response response = get(this.url,
                 Map.of("customer", customer,
-                "startTime", startTime,
-                "endTime", endTime));
+                        "start", start,
+                        "end", end));
         throwExceptionIfNotOkayHttpStatus(response);
         return response.getContent();
     }
@@ -125,22 +126,22 @@ public class PhoneBillRestClient extends HttpRequestHelper
         }
         else if (code != HTTP_OK)
         {
-            throw new PhoneBillRestException(code);
+            String codeS = Integer.toString(code);
+            throw new PhoneBillException(codeS);
         }
         return response;
     }
 
+    /**
+     * Class for PhoneBillRestException
+     */
+    /*private class PhoneBillRestException extends RuntimeException
+    {
 
-//    /**
-//     * Class for PhoneBillRestException
-//     */
-//    @VisibleForTesting
-//    private class PhoneBillRestException extends RuntimeException
-//    {
-//        public PhoneBillRestException(int httpStatusCode)
-//        {
-//            super("Got an HTTP Status Code of " + httpStatusCode);
-//        }
-//    }
+        public PhoneBillRestException(int httpStatusCode)
+        {
+            super("Got an HTTP Status Code of " + httpStatusCode);
+        }
+    }*/
 
 }

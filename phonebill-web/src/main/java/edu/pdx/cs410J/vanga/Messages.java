@@ -87,8 +87,12 @@ public class Messages
         return map;
     }
 
-    public static String returnedEmptyPhoneBill() {
-        return "Query returns no phone calls";
+    public static String invalidFormatMessage(String parameterName )
+    {
+        return String.format("The parameter \"%s\" is not correctly formatted.", parameterName);
     }
 
+    static String noPhoneBillForCustomer(String customerName) {
+        return String.format("No phone bill for customer %s", customerName);
+    }
 }

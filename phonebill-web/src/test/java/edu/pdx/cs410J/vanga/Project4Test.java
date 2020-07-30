@@ -54,7 +54,7 @@ public class Project4Test extends InvokeMainTestCase
         String[] arr = {"-README"};
         MainMethodResult result = invokeMain(arr);
         assertThat(result.getExitCode(), equalTo(0));
-        assertThat(result.getTextWrittenToStandardOut(), containsString("Project 4 README by Likhitha for CS510J Summer"));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("usage: java edu.pdx.cs410J."));
     }
 
     /**
@@ -65,32 +65,12 @@ public class Project4Test extends InvokeMainTestCase
         String[] arr = {"-README","-port", "8080", "-host", "localhost"};
         MainMethodResult result = invokeMain(arr);
         assertThat(result.getExitCode(), equalTo(0));
-        assertThat(result.getTextWrittenToStandardOut(), containsString("Project 4 README by Likhitha for CS510J"));
+        assertThat(result.getTextWrittenToStandardOut(), containsString("Person whose phone bill we’re modeling"));
     }
 
-    /**
-     * Test for readme option with other command line arguments
-     */
-    @Test
-    public void search7Test() {
-        String[] arr = {"-README","-port", "8080", "-host", "localhost", "-search", "rwef"};
-        MainMethodResult result = invokeMain(arr);
-        assertThat(result.getExitCode(), equalTo(1));
-        assertThat(result.getTextWrittenToStandardError(), containsString("Missing command line arguments"));
-        assertThat(result.getTextWrittenToStandardError(),containsString("Missing command line arguments"));
-    }
 
-    /**
-     * Test for readme option with other command line arguments
-     */
-    @Test
-    public void search7Test1() {
-        String[] arr = {"-README","-port", "8080", "-host", "localhost", "-search", "rwef"};
-        MainMethodResult result = invokeMain(arr);
-        assertThat(result.getExitCode(), equalTo(1));
-        //assertThat(result.getTextWrittenToStandardError(), containsString("MISSING CMD LINE ARGS FOR SEARCH"));
-        assertThat(result.getTextWrittenToStandardError(),containsString("Missing command line arguments"));
-    }
+
+
 
     /**
      * Test for readme option with other command line arguments

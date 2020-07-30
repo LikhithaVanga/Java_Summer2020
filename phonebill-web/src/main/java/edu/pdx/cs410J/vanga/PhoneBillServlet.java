@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -25,8 +27,8 @@ public class PhoneBillServlet extends HttpServlet
     static final String DEFINITION_PARAMETER = "definition";
     private static final String CALLER_PARAMETER = "caller";
     private static final String CALLEE_PARAMETER = "callee";
-    private static final String START_TIME_PARAMETER = "startTime";
-    private static final String END_TIME_PARAMETER = "endTime";
+    public static final String START_TIME_PARAMETER = "start";
+    public static final String END_TIME_PARAMETER = "end";
 
     private Map<String, PhoneBill> bills = new HashMap<>();
 
@@ -44,62 +46,63 @@ public class PhoneBillServlet extends HttpServlet
         //    http://localhost:8080/phonebill/calls?customer=Customer
         // OR...
         // 2. Are we searching for all calls for a customer within a time period?
-        //    http://localhost:8080/phonebill/calls?customer=Customer&startTime=9/21/2018&endTime=9/22/2018
+        //    http://localhost:8080/phonebill/calls?customer=Customer&start=9/21/2018&end=9/22/2018
 
         response.setContentType( "text/plain" );
 
         String customer = getParameter(CUSTOMER_PARAMETER, request );
-        String startTime = getParameter(START_TIME_PARAMETER, request);
-        String endTime = getParameter(END_TIME_PARAMETER, request);
+        String start = getParameter(START_TIME_PARAMETER, request);
+        String end = getParameter(END_TIME_PARAMETER, request);
 
         if (customer == null)
         {
             missingRequiredParameter(response, CUSTOMER_PARAMETER);
         }
-        else if (startTime == null && endTime == null)
+        else if (start == null && end == null)
         {
             // 1. Simply returning all calls for a customer
             //    http://localhost:8080/phonebill/calls?customer=Customer
             writePrettyPhoneBill(customer, response);
         }
-        else if (startTime == null)
+        else if (start == null)
         {
             missingRequiredParameter(response, START_TIME_PARAMETER);
         }
-        else if (endTime == null)
+        else if (end == null)
         {
             missingRequiredParameter(response, END_TIME_PARAMETER);
         }
         else
         {
             // 2. We searching for all calls for a customer within a time period
-            //    http://localhost:8080/phonebill/calls?customer=Customer&startTime=9/21/2018&endTime=9/22/2018
-            writePrettyPhoneBill(customer, startTime, endTime, response);
+            //    http://localhost:8080/phonebill/calls?customer=Customer&start=9/21/2018&end=9/22/2018
+            writePrettyPhoneBill(customer, start, end, response);
         }
     }
 
     /**
-     * Print out a Pretty Phone Bill of all calls for a customer between startTime and endTime
+     * Print out a Pretty Phone Bill of all calls for a customer between start and endTime
      * @param customer
-     * @param startTime
-     * @param endTime
+     * @param start
+     * @param end
      * @param response
      * @throws IOException
      */
-    private void writePrettyPhoneBill(String customer, String startTime, String endTime, HttpServletResponse response) throws IOException
+    private void writePrettyPhoneBill(String customer, String start, String end, HttpServletResponse response) throws IOException
     {
         PhoneBill bill = getPhoneBill(customer);
 
         if (bill == null)
         {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            String mes = Messages.noPhoneBillForCustomer(customer);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND,mes);
         }
         else
         {
-            Collection<PhoneCall> calls = bill.getPhoneCallsByDate(startTime, endTime);
+            Collection<PhoneCall> calls = bill.getPhoneCallsByDate(start, end);
 
             PrintWriter writer = response.getWriter();
-            PrettyPrinter pretty = new PrettyPrinter(writer);
+            TextDumper pretty = new TextDumper(writer);
             pretty.dump(customer, calls);
             response.setStatus(HttpServletResponse.SC_OK);
         }
@@ -117,12 +120,13 @@ public class PhoneBillServlet extends HttpServlet
 
         if (bill == null)
         {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            String mes = Messages.noPhoneBillForCustomer(customer);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND,mes);
         }
         else
         {
             PrintWriter writer = response.getWriter();
-            PrettyPrinter pretty = new PrettyPrinter(writer);
+            TextDumper pretty = new TextDumper(writer);
             pretty.dump(bill);
             response.setStatus(HttpServletResponse.SC_OK);
         }
@@ -156,10 +160,10 @@ public class PhoneBillServlet extends HttpServlet
 
         String caller = getParameter(CALLER_PARAMETER, request);
         String callee = getParameter(CALLEE_PARAMETER, request);
-        String startTime = getParameter(START_TIME_PARAMETER, request);
-        String endTime = getParameter(END_TIME_PARAMETER, request);
+        String start = getParameter(START_TIME_PARAMETER, request);
+        String end = getParameter(END_TIME_PARAMETER, request);
 
-        PhoneCall call = new PhoneCall(caller, callee, startTime, endTime);
+        PhoneCall call = new PhoneCall(caller, callee, start, end);
         bill.addPhoneCall(call);
 
         response.setStatus(HttpServletResponse.SC_OK);

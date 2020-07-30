@@ -44,14 +44,7 @@ public class PhoneBillTest {
 
 
 
-    @Test
-    public void compareTo() {
-        PhoneBill b = new PhoneBill("Likhitha");
-        PhoneCall c = new PhoneCall("503-449-7833", "209-401-9876", "10/10/2020 10:00 am", "10/10/2020 10:00 am");
-        PhoneCall d = new PhoneCall("503-449-7833", "209-404-9876", "10/10/2020 10:01 am", "10/10/2020 10:00 am");
 
-        assertEquals(c.getStartTime().compareTo(d.getStartTime()), -1);
-    }
 
 
 
@@ -60,22 +53,11 @@ public class PhoneBillTest {
         PhoneBill b = new PhoneBill("Likhitha");
         String callerNumber = "503-449-7833";
         PhoneCall c = new PhoneCall("503-449-7833", "209-401-9876", "10/10/2020 10:00 am", "10/10/2020 10:00 am");
-        PhoneCall d = new PhoneCall("503-449-7833", "209-404-9876", "10/10/2020 10:01 am", "10/10/2020 10:00 am");
+        PhoneCall d = new PhoneCall("503-449-7833", "209-404-9876", "10/10/2020 10:00 am", "10/10/2020 10:00 am");
         int caller = c.compareTo(c);
         assertEquals(caller, 0);
     }
 
-    @Test
-    public void getTotalTime() throws ParseException {
-        PhoneBill b = new PhoneBill("Likhitha");
-
-        PhoneCall c = new PhoneCall("503-449-7833", "209-401-9876", "10/10/2020 10:00 am", "10/10/2020 10:00 am");
-        //PhoneCall d = new PhoneCall("503-449-7833", "209-404-9876", "10/10/2020 10:01 am", "10/10/2020 10:00 am");
-        int total = b.getTotalMinutes();
-        assertEquals(total,0);
-
-
-    }
 
 
 
