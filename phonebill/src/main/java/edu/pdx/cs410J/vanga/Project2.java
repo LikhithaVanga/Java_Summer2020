@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 //package edu.pdx.cs410J.vanga;
 //
 //import java.util.ArrayList;
@@ -112,15 +111,3 @@
 //    }
 //  }
 //}
-=======
-//package edu.pdx.cs410J.vanga;
-//
-//import java.util.ArrayList;
-//
-//public class Project2 {
-//  /**
-//   * Readme method that prints a readme based on user input
-//   */
-// 
-//}
->>>>>>> 7812b07bb80f8aa65cab6e4840571bac2de7a984
